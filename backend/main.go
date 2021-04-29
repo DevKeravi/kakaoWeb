@@ -1,13 +1,8 @@
 package main
 
-import (
-	"fmt"
-
-	"github.com/gin-gonic/gin"
-)
+import "kakaoWeb/backend/app"
 
 func main() {
-	r := gin.Default()
-
-	r.Run(":8080")
+	app.Init()
+	app.Run(":10102")
 }
