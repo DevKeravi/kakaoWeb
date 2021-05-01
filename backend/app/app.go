@@ -2,6 +2,7 @@ package app
 
 import (
 	"io/ioutil"
+	"kakaoWeb/backend/model"
 	"log"
 	"math/rand"
 	"net/http"
@@ -14,14 +15,12 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func indexHandler(c *gin.Context) {
-	c.Redirect(http.StatusTemporaryRedirect, "/login.html")
-	c.Abort()
-}
 func loginHandler(c *gin.Context) {
 	url := conf.AuthCodeURL(state, oauth2.AccessTypeOffline)
 	c.Redirect(http.StatusTemporaryRedirect, url)
+	c.Abort()
 }
+
 func callbackhandler(c *gin.Context) {
 	str := c.Request.FormValue("state")
 	if str != state {
@@ -62,24 +61,27 @@ func callbackhandler(c *gin.Context) {
 		log.Println("ReadAll:", err)
 		return
 	}
-	log.Println("parseResponseBody: ")
-	log.Println(string(body))
-
+	model.Create(body)
 	c.Redirect(http.StatusTemporaryRedirect, "/")
 	c.Abort()
 }
 func Init() {
 	rand.Seed(time.Now().UnixNano())
 }
+func indexHandler(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"message": "okay"})
+}
 
 func Run(addr string) {
 	r := gin.Default()
+	model.Init()
 	r.Use(static.Serve("/", static.LocalFile("../frontend/kakaoweb/public/", false)))
-	/*
-		r.GET("/", indexHandler)
-		r.GET("/login", loginHandler)
-		r.GET("/auth", callbackhandler)
-	*/
+
+	api := r.Group("api")
+	{
+		api.GET("/login", loginHandler)
+		api.GET("/auth", callbackhandler)
+	}
 
 	r.Run(addr)
 }

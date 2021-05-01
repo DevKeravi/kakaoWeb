@@ -35,5 +35,8 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:10102"
+  "devDependencies": {
+    "http-proxy-middleware": "^0.19.1"
+  },
+  "proxy": "http://localhost:10102/"
 }
