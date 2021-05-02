@@ -18,7 +18,6 @@ import (
 func loginHandler(c *gin.Context) {
 	url := conf.AuthCodeURL(state, oauth2.AccessTypeOffline)
 	c.Redirect(http.StatusTemporaryRedirect, url)
-	c.Abort()
 }
 
 func callbackhandler(c *gin.Context) {
@@ -26,7 +25,6 @@ func callbackhandler(c *gin.Context) {
 	if str != state {
 		log.Printf("invaild oauth state, expected '%s', got '%s'\n", state, str)
 		c.Redirect(http.StatusTemporaryRedirect, "/")
-		c.Abort()
 		return
 	}
 
@@ -39,7 +37,6 @@ func callbackhandler(c *gin.Context) {
 	if err != nil {
 		log.Printf("conf.Exchange() failed with %s \n", err)
 		c.Redirect(http.StatusTemporaryRedirect, "/")
-		c.Abort()
 		return
 	}
 
@@ -61,26 +58,39 @@ func callbackhandler(c *gin.Context) {
 		log.Println("ReadAll:", err)
 		return
 	}
+
 	model.Create(body)
+
+	c.SetCookie("kakaoAuth", string(body), 3600, "/", "", false, false)
 	c.Redirect(http.StatusTemporaryRedirect, "/")
-	c.Abort()
+
 }
 func Init() {
 	rand.Seed(time.Now().UnixNano())
 }
+
 func indexHandler(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "okay"})
+	cookie, err := c.Cookie("kakaoAuth")
+	if err != nil {
+		c.JSON(http.StatusOK, "")
+		return
+	}
+
+	data := model.NewData(cookie)
+	c.JSON(http.StatusOK, model.Get(data.Name))
 }
 
 func Run(addr string) {
 	r := gin.Default()
 	model.Init()
+	r.LoadHTMLGlob("../frontend/kakaoweb/public/*")
 	r.Use(static.Serve("/", static.LocalFile("../frontend/kakaoweb/public/", false)))
 
 	api := r.Group("api")
 	{
 		api.GET("/login", loginHandler)
 		api.GET("/auth", callbackhandler)
+		api.GET("/index", indexHandler)
 	}
 
 	r.Run(addr)

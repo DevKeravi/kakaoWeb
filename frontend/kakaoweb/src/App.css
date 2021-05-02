@@ -1,1 +1,25 @@
+.FriendPage{
+	background-color: #ffd400;
+	border: solid #504315 3px;
+}
+.ListHead{
+	border: solid #504315 3px;
+	text-align: center;
+}
+.ListBody {
+	border: solid #504315 3px;
+}
+
+.MyThumbNail {
+	border: solid #504315 1px;
+}
+.UserInfo {
+	padding-top: 2px;
+	padding-bottom: 2px;
+	background-color: #f2f2f2;
+}
+
+.MyName {
+	font-size: 20px;
+}
 
