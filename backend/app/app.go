@@ -21,6 +21,7 @@ func loginHandler(c *gin.Context) {
 }
 
 func callbackhandler(c *gin.Context) {
+
 	str := c.Request.FormValue("state")
 	if str != state {
 		log.Printf("invaild oauth state, expected '%s', got '%s'\n", state, str)
@@ -71,6 +72,7 @@ func Init() {
 
 func indexHandler(c *gin.Context) {
 	cookie, err := c.Cookie("kakaoAuth")
+
 	if err != nil {
 		c.JSON(http.StatusOK, "")
 		return

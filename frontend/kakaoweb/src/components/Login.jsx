@@ -1,6 +1,8 @@
 import React,{Component} from 'react';
+import store from '../store' ;
 
 export default class Login extends Component {
+	state = {test:1}
 
 	render() {
 		return (
